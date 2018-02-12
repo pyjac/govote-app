@@ -5,6 +5,7 @@ import style from './style';
 import axios from 'axios';
 import classnames from 'classnames';
 import Rodal from 'rodal';
+import Autocomplete from 'accessible-autocomplete/preact';
 
 import 'rodal/lib/rodal.css';
 
@@ -125,6 +126,17 @@ export default class Search extends Component {
     let disqusSection = classnames(style.disqus_section, {
       'disqus_show': this.state.showdisqus
     })
+    function suggest (query, syncResults) {
+      axios.get('https://api.govote.org.ng/search?query=' + query + '&key=k9ihbvse57fvsujbsvsi5362WE$NFD2')
+      .then(res => {
+        let locations = res.data.data.map(location => `${location.address}, ${location.area}`);
+        syncResults(locations);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+    }    
+    
     return (
       <div className={style.search}>
         <div className={style.search_bar}>
@@ -133,6 +145,7 @@ export default class Search extends Component {
             <div className="field">
               <div className="control has-icons-right">
                 <input type="text" onChange={this.handleChange} value={this.state.value} className="input is-primary" placeholder="Search Locations: Lekki, Badagry, Epe e.t.c" />
+                <Autocomplete id='autocomplete' source={suggest} className="input is-primary" />
                 <button type="submit" className={style.search_icon}>
                   <svg width="15px" viewBox="0 0 136 137" version="1.1" xmlns="http://www.w3.org/2000/svg">
                     <title>search19</title>
